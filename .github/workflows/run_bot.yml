@@ -1,0 +1,25 @@
+name: Daily Stock Analysis
+
+on:
+  schedule:
+    - cron: '50 6 * * 1-5'  # 월~금 한국시간 오후 3시 50분 실행
+  workflow_dispatch:        # 수동 실행 버튼 생성
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: |
+          pip install finance-datareader pandas openpyxl
+      - name: Run bot
+        env:
+          MY_EMAIL: ${{ secrets.MY_EMAIL }}
+          MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
+          RECEIVE_EMAIL: ${{ secrets.RECEIVE_EMAIL }}
+        run: python stock_bot.py
