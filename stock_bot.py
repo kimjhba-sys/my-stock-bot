@@ -75,4 +75,4 @@ def send_visual_report(df):
         server.send_message(msg)
 
 res = get_market_analysis()
-send_visual_report(res).
+send_visual_report(res)
