@@ -13,9 +13,8 @@ MY_EMAIL = os.environ.get('MY_EMAIL')
 MY_PASSWORD = os.environ.get('MY_PASSWORD')
 RECEIVE_EMAIL = os.environ.get('RECEIVE_EMAIL')
 
-# --- 이하 분석 및 전송 로직 (기존과 동일) ---
 def get_market_analysis():
-    print("분석 시작...")
+    print("데이터 분석 중...")
     stocks = fdr.StockListing('KRX')
     target_stocks = stocks.dropna(subset=['Marcap']).sort_values('Marcap', ascending=False).head(500)
     results = []
@@ -42,9 +41,7 @@ def get_market_analysis():
             if score >= 50:
                 results.append({'점수': score, '종목명': name, '세력선괴리': whale_gap, '224일선괴리': gap_224, '매집': f"{acc_count}일", '현재가': int(curr_c)})
         except: continue
-    df_res = pd.DataFrame(results).sort_values('점수', ascending=False).reset_index(drop=True)
-    df_res.index = df_res.index + 1
-    return df_res
+    return pd.DataFrame(results).sort_values('점수', ascending=False).reset_index(drop=True)
 
 def send_visual_report(df):
     if df.empty: return
@@ -56,23 +53,26 @@ def send_visual_report(df):
     for i, row in top_10.iterrows():
         score_style = "color: #d9534f; font-weight: bold;" if row['점수'] >= 90 else ""
         bg_style = "background-color: #fff3cd;" if 0 <= row['224일선괴리'] <= 3 else ""
-        table_rows += f"<tr style='{bg_style}'><td style='border:1px solid #ddd; padding:8px; text-align:center;'>{i}</td><td style='border:1px solid #ddd; padding:8px; text-align:center;'><b>{row['종목명']}</b></td><td style='border:1px solid #ddd; padding:8px; text-align:center; {score_style}'>{row['점수']}점</td><td style='border:1px solid #ddd; padding:8px; text-align:center;'>{row['세력선괴리']}%</td><td style='border:1px solid #ddd; padding:8px; text-align:center;'>{row['224일선괴리']}%</td><td style='border:1px solid #ddd; padding:8px; text-align:center;'>{row['현재가']:,}원</td></tr>"
-    html_content = f"<html><body><h2>🎯 오늘의 세력 포착 요약</h2><table style='border-collapse: collapse; width: 100%; border: 1px solid #ddd;'><thead><tr style='background-color: #f2f2f2;'><th style='border:1px solid #ddd; padding:10px;'>순위</th><th style='border:1px solid #ddd; padding:10px;'>종목명</th><th style='border:1px solid #ddd; padding:10px;'>점수</th><th style='border:1px solid #ddd; padding:10px;'>세력선괴리</th><th style='border:1px solid #ddd; padding:10px;'>224일선괴리</th><th style='border:1px solid #ddd; padding:10px;'>현재가</th></tr></thead><tbody>{table_rows}</tbody></table></body></html>"
+        table_rows += f"<tr style='{bg_style}'><td style='border:1px solid #ddd; padding:8px; text-align:center;'>{i+1}</td><td style='border:1px solid #ddd; padding:8px; text-align:center;'><b>{row['종목명']}</b></td><td style='border:1px solid #ddd; padding:8px; text-align:center; {score_style}'>{row['점수']}점</td><td style='border:1px solid #ddd; padding:8px; text-align:center;'>{row['세력선괴리']}%</td><td style='border:1px solid #ddd; padding:8px; text-align:center;'>{row['224일선괴리']}%</td><td style='border:1px solid #ddd; padding:8px; text-align:center;'>{row['현재가']:,}원</td></tr>"
+    html_content = f"<html><body><h2>🎯 {today} 세력 포착 리포트</h2><table style='border-collapse: collapse; width: 100%; border: 1px solid #ddd;'><thead><tr style='background-color: #f2f2f2;'><th style='border:1px solid #ddd; padding:10px;'>순위</th><th style='border:1px solid #ddd; padding:10px;'>종목명</th><th style='border:1px solid #ddd; padding:10px;'>점수</th><th style='border:1px solid #ddd; padding:10px;'>세력선괴리</th><th style='border:1px solid #ddd; padding:10px;'>224일선괴리</th><th style='border:1px solid #ddd; padding:10px;'>현재가</th></tr></thead><tbody>{table_rows}</tbody></table></body></html>"
     msg = MIMEMultipart()
     msg['Subject'] = f"🚀 [TOP 10] {today} 세력 포착 리포트"
     msg['From'], msg['To'] = MY_EMAIL, RECEIVE_EMAIL
     msg.attach(MIMEText(html_content, 'html'))
+    
+    # --- 이 부분이 수정된 핵심 부분입니다 ---
     with open(file_name, 'rb') as f:
         part = MIMEBase('application', 'octet-stream')
-        part.set_payload(f.read())
-        encoders.encode_base64(part)
+        part.set_payload(f.read())  # 바이너리로 읽기
+        encoders.encode_base64(part) # 베이스64 인코딩
         part.add_header('Content-Disposition', f'attachment; filename={file_name}')
         msg.attach(part)
+    # ------------------------------------
+
     with smtplib.SMTP('smtp.gmail.com', 587) as server:
         server.starttls()
         server.login(MY_EMAIL, MY_PASSWORD)
         server.send_message(msg)
 
-# 실행
 res = get_market_analysis()
-send_visual_report(res)
+send_visual_report(res).
