@@ -9,9 +9,9 @@ from email import encoders
 from datetime import datetime, timedelta
 
 # 금고(Secrets)에서 정보 가져오기
-MY_EMAIL = os.environ.get('MY_EMAIL')
-MY_PASSWORD = os.environ.get('MY_PASSWORD')
-RECEIVE_EMAIL = os.environ.get('RECEIVE_EMAIL')
+MY_EMAIL = os.environ.get('kimjhba@gmail.com')
+MY_PASSWORD = os.environ.get('wdunfffoaugcixxt')
+RECEIVE_EMAIL = os.environ.get('kimjhba@gmail.com')
 
 def get_market_analysis():
     print("데이터 분석 중...")
