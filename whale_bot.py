@@ -84,8 +84,8 @@ def send_email(df):
     
     msg = MIMEMultipart()
     msg['Subject'] = f"📊 [VIP 전략] {datetime.now().strftime('%m/%d')} 포착 종목"
-    msg['From'] = MY_EMAIL
-    msg['To'] = MY_EMAIL
+    msg['From'] = EMAIL_USER
+    msg['To'] = EMAIL_PASSWORD
     msg.attach(MIMEText(html, 'html'))
     
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
