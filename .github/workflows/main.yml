@@ -22,6 +22,6 @@ jobs:
 
       - name: 주식 봇 실행
         env:
-          EMAIL_USER: ${{ secrets.MY_EMAIL }}
-          EMAIL_PASSWORD: ${{ secrets.MY_PASSWORD }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
         run: python whale_bot.py
