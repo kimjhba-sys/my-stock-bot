@@ -9,8 +9,8 @@ import time
 import os
 
 # --- [비밀 금고에서 정보 가져오기] ---
-MY_EMAIL = os.environ.get('kimjhba@gmail.com')
-MY_PASSWORD = os.environ.get('wdunfffoaugcixxt')
+EMAIL_USER = os.environ.get('kimjhba@gmail.com')
+EMAIL_PASSWORD = os.environ.get('wdunfffoaugcixxt')
 
 def get_pro_whale_report():
     target_date = datetime.now().strftime("%Y%m%d")
@@ -89,7 +89,7 @@ def send_email(df):
     msg.attach(MIMEText(html, 'html'))
     
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-        server.login(MY_EMAIL, MY_PASSWORD)
+        server.login(EMAIL_USER, EMAIL_PASSWORD)
         server.send_message(msg)
 
 # 실행
