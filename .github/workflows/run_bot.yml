@@ -19,7 +19,7 @@ jobs:
           pip install finance-datareader pandas openpyxl
       - name: Run bot
         env:
-          MY_EMAIL: ${{ secrets.MY_EMAIL }}
-          MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           RECEIVE_EMAIL: ${{ secrets.RECEIVE_EMAIL }}
         run: python stock_bot.py
