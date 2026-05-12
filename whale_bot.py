@@ -8,9 +8,10 @@ from email.mime.text import MIMEText
 import time
 import os
 
-# --- [비밀 금고에서 정보 가져오기] ---
-EMAIL_USER = os.environ.get('kimjhba@gmail.com')
-EMAIL_PASSWORD = os.environ.get('wdunfffoaugcixxt')
+# --- [1. 비밀 금고(GitHub Secrets)에서 정보 가져오기] ---
+# 괄호 안은 본인의 이메일 주소가 아니라, GitHub에 등록한 '이름표'를 적는 곳입니다.
+EMAIL_USER = os.environ.get('EMAIL_USER')
+EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 
 def get_pro_whale_report():
     target_date = datetime.now().strftime("%Y%m%d")
@@ -63,7 +64,10 @@ def get_pro_whale_report():
     return pd.DataFrame(final_results).sort_values('점수', ascending=False)
 
 def send_email(df):
-    if df.empty: return
+    if df.empty: 
+        print("포착된 종목이 없습니다.")
+        return
+        
     html = f"""
     <html><body>
         <h2 style='color: #2c3e50;'>🏆 오늘의 세력 분석 리포트</h2>
@@ -85,13 +89,20 @@ def send_email(df):
     msg = MIMEMultipart()
     msg['Subject'] = f"📊 [VIP 전략] {datetime.now().strftime('%m/%d')} 포착 종목"
     msg['From'] = EMAIL_USER
-    msg['To'] = EMAIL_PASSWORD
+    msg['To'] = EMAIL_USER  # 본인(EMAIL_USER)에게 발송하도록 수정함
     msg.attach(MIMEText(html, 'html'))
     
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-        server.login(EMAIL_USER, EMAIL_PASSWORD)
-        server.send_message(msg)
+    # --- [2. 메일 발송 실행] ---
+    try:
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(EMAIL_USER, EMAIL_PASSWORD)
+            server.send_message(msg)
+        print("✅ 메일 발송 성공!")
+    except Exception as e:
+        print(f"❌ 메일 발송 실패: {e}")
+        raise e
 
-# 실행
-report_df = get_pro_whale_report()
-send_email(report_df)
+# --- [3. 메인 실행 루틴] ---
+if __name__ == "__main__":
+    report_df = get_pro_whale_report()
+    send_email(report_df)
