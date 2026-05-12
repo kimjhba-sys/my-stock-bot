@@ -1,0 +1,30 @@
+name: Stock Bot New Run
+
+on:
+  schedule:
+    # 한국 시간 기준 매일 오후 3시 40분 실행
+    - cron: '40 6 * * *'
+  workflow_dispatch: # "지금 당장 실행" 버튼을 활성화합니다.
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 가져오기
+        uses: actions/checkout@v4
+
+      - name: 파이썬 설치
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 필수 도구 설치
+        run: |
+          pip install --upgrade pip
+          pip install pandas FinanceDataReader pykrx openpyxl
+
+      - name: 주식 봇 실행
+        env:
+          MY_EMAIL: ${{ secrets.MY_EMAIL }}
+          MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
+        run: python whale_bot.py
