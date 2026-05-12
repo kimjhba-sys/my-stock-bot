@@ -18,7 +18,7 @@ jobs:
       - name: 필수 도구 설치
         run: |
           pip install --upgrade pip
-          pip install pandas FinanceDataReader pykrx openpyxl
+          pip install pandas finance-datareader pykrx openpyxl
 
       - name: 주식 봇 실행
         env:
